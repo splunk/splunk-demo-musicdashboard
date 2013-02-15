@@ -278,7 +278,7 @@
                 }
 
                 // TODO add your API key here
-                // var apiKey = '';
+                var apiKey = '';
                 if (!apiKey) { alert('Missing LastFM API key. Please grab one and modify your JavaScript code to include it.'); return; }
 
                 var artists = _.map(results.collection().toJSON(), function(item) { return {name: item.search_terms}; });

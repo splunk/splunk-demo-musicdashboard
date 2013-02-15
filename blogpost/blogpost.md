@@ -26,6 +26,8 @@ TODO point to github repo of this example, linked somewhere
 TODO images before each section
 
 ## Step 0: Basic Dashboard
+![Basic dashboard](step0.png)
+
 Before we dive into the more advanced features of the Splunk App Framework, let's build a basic dashboard, very reminiscent of a dashboard you might find in existing Splunk Apps found on Splunkbase.
 
 First, navigate to the server/apps/music-dashboard folder. Open up home.html, which was placed there are part of the `createapp` setup. Let's make a few dashboard panels using our demo data from the setup portion. We'll make the following dashboards:
@@ -160,6 +162,8 @@ Finally, let's use the Splunk App Framework's JavaScript API to add some advance
 All right, now let's open up http://localhost:3000/appfx/musicdashboard and take a look!
 
 ## Step 1: JQueryUI Accordions
+![Accordions](step1.png)
+
 Awesome, so by now we've gotten our basic dashboard setup, so we know we can use the framework to make Splunk dashboards. But I wouldn't be writing this post if I didn't want to show you some of the really cool features we've enabled.
 
 So, let's say that you've decided our dashboard looks too cluttered. It would, for instance, be great if we could collapse the "Top Artist Searches" and "Top Song Downloads" into one container, and place the "Top Artists Downloads" chart to the left, achieving just one row of charts. As a web developer, you are aware that there are many open-source UI widgets available from the web. A popular widget library is [JQuery UI](http://jqueryui.com/). On that site, in particular, an [accordion widget](http://api.jqueryui.com/accordion) is described. We'll choose this widget to help us out with our cluttered layout.
@@ -238,119 +242,13 @@ Just as the documentation describes.  Reload the page and see how easy it was to
 
 
 ## Step 2: D3
+![D3](step2.png)
+
 Now that our UI is no longer as cluttered, we've freed up some screen real estate for perhaps another dashboard panel. This time, we don't want to use any of the built-in Splunk charts to display our data, but instead we decide that a chart from the [D3 gallery](https://github.com/mbostock/d3/wiki/Gallery) might help us best to gain insight into our data. (As a side note, if you haven't before, peruse the D3 gallery. It's fun!)
 
 For this example, we'll choose the [Sankey diagram](http://bost.ocks.org/mike/sankey/) to help us visualize which artists' songs are downloaded to which mobile devices.
 
-After reading the documentation for the Sankey diagram we see that it is modular, but the code is a little nasty. Let's create a helper JavaScript file to abstract away some of the complexity. Call it `sankey-helper.js` and drop it in /server/apps/musicdashboard/static/musicdashboard/. Give it these contents:
-TODO maybe just have a link to this file in github 
-
-	(function() {
-	    window.MusicDashboard = window.MusicDashboard || {};
-
-	    MusicDashboard.SankeyHelper = (function() {
-	        var UA_DISPLAY_NAMES = {
-	            'ua-mobile-android': 'Android',
-	            'ua-mobile-ipad': 'iPad',
-	            'ua-mobile-blackberry': 'Blackberry',
-	            'ua-mobile-iphone': 'iPhone',
-	            'ua-mobile-ipod': 'iPod'
-	        };
-	        
-	        var formatName = function(name) {
-	            return UA_DISPLAY_NAMES[name] || name;
-	        };
-	        
-	        var margin = {top: 1, right: 1, bottom: 6, left: 1};
-	        // Unfortunately sankey.js depends on a global width variable
-        	window.width = 900 - margin.left - margin.right;
-	        var height = 500 - margin.top - margin.bottom;
-	        var color = d3.scale.category20();
-	        var link = null;
-
-	        var setupSankey = function() {
-	            
-	            var svg = d3.select("#chart").append("svg")
-	                    .attr("width", width + margin.left + margin.right)
-	                    .attr("height", height + margin.top + margin.bottom)
-	                .append("g")
-	                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-	            
-	            
-	            var sankey = d3.sankey()
-	                .nodeWidth(15)
-	                .nodePadding(10)
-	                .size([width, height]);
-
-	            var path = sankey.link();
-
-	            return {
-	                svg: svg,
-	                sankey: sankey,
-	                path: path
-	            };
-
-	        };
-
-	        var renderSankey = function(nodes, links, svg, sankey, path) {
-	            sankey
-	                .nodes(nodes)
-	                .links(links)
-	                .layout(1); 
-
-	            link = svg.append("g").selectAll(".link")
-	                  .data(links)
-	                .enter().append("path")
-	                  .attr("class", "link")
-	                  .attr("d", path)
-	                  .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-	                  .sort(function(a, b) { return b.dy - a.dy; });
-
-	            link.append("title")
-	                  .text(function(d) { return d.source.name + " -> " + formatName(d.target.name) + "\n" + d.value; });
-
-	            var node = svg.append("g").selectAll(".node")
-	                  .data(nodes)
-	                .enter().append("g")
-	                  .attr("class", "node")
-	                  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-	                                
-	            node.append("rect")
-	                  .attr("height", function(d) { return d.dy; })
-	                  .attr("width", sankey.nodeWidth())
-	                  .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
-	                  .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
-	                .append("title")
-	                  .text(function(d) { return formatName(d.name) + "\n" + d.value; });
-
-
-	            node.append("text")
-	                  .attr("x", -6)
-	                  .attr("y", function(d) { return d.dy / 2; })
-	                  .attr("dy", ".35em")
-	                  .attr("text-anchor", "end")
-	                  .attr("transform", null)
-	                  .text(function(d) { return formatName(d.name); })
-	                .filter(function(d) { return d.x < width / 2; })
-	                  .attr("x", 6 + sankey.nodeWidth())
-	                  .attr("text-anchor", "start");
-	 
-	        };
-
-	        var getLink = function() {
-	            return link;
-	        };
-
-	        return {
-	            setupSankey: setupSankey,
-	            renderSankey: renderSankey,
-	            getLink: getLink
-	        };
-	    }());
-
-
-	}())
+After reading the documentation for the Sankey diagram we see that it is modular, but the code is a little nasty. I've created a helper library to abstract away some of the complexity. Grab [sankey-helper.js](http://github.com/splunk/splunk-demo-musicdashboard/musicdashboard/static/musicdashboard/sankey-helper.js) and drop it in /server/apps/musicdashboard/static/musicdashboard/. 
 
 Let's also drop some styles in our `style` tag to make the chart nice once it renders:
 
@@ -468,6 +366,8 @@ And that's it! No black magic!
 
 
 ## Step 3: Interactivity
+![Interactivity](step3.png)
+
 After having our Sankey diagram in place, it's great to see the relationships in our data, but what if we're also interested in what Splunk events are specifically driving the output for this chart? With just a few more lines of code we can wire up the Sankey diagram to an existing Splunk widget. When you click on a link between an artist and a mobile device, now you'll be able to see which events were responsible for the magnitude of that link.
 
 First, we'll add a little bit of CSS to ensure the link that we click on will stay highlighted. Also, we'll add a little helper CSS to make the built-in Splunk event results table scrollable. In our `style` tag, then, add:
@@ -533,6 +433,8 @@ Again, with these few lines of targeted layout and data-binding code, we can ach
 
 
 ## Step 4: Images!
+![Images!](step4.png)
+
 OK, so we've done some really cool stuff visualizing data generated from our Splunk instance, but what if we want to take it a step further? Since the Splunk App Framework allows us to use standard web technologies, let's use the data we get back from Splunk to get more detailed data from an external web service and visualize it directly in our Splunk application.
 
 To start, notice how one of our charts shows us the top artists that users search for. We should actually *show* them this data. As it turns out, there's a web service that lets us give it names of artists, and in return, we get the images for those artists. Check it out: it's the [LastFM API](http://www.last.fm/api/intro). To take this demo a step further, we'll need a developer API key in order to make requests to this service. Go ahead and provision one for yourself via the instructions on that site. Once you've done that, we can continue!

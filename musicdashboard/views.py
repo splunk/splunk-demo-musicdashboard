@@ -1,13 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from appfx.decorators.render import render_to
 
-@render_to('musicdashboard:home.html')
-@login_required
-def home(request):
-    return {
-        "app_name": "musicdashboard"
-    }
-
 @render_to('musicdashboard:step0.html')
 @login_required
 def step0(request):
