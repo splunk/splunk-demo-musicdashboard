@@ -1,4 +1,4 @@
-# Building Dashboards in the Splunk App Framework
+# A First Look at Building Dashboards in the Splunk App Framework
 
 As mentioned in previous posts, the recently released Splunk App Framework allows developers to draw from the power of modern web programming to create new and exciting applications built on Splunk. I'm really excited about all the new abilities the framework provides, and I think it will help usher in some really awesome Splunk Apps.
 
@@ -143,7 +143,7 @@ As you can see, it's very simple and standard to add charting UI, using Django t
 
 	{% endblock contexts %}
 
-Finally, let's use the Splunk SDK for JavaScript API to add some advanced options to one of our charts. Replace your `{% block js %}` with this:
+Finally, let's use the Splunk App Framework JavaScript API to add some advanced options to one of our charts. Replace your `{% block js %}` with this:
 
 	{% block js %}    
 	    <script>
