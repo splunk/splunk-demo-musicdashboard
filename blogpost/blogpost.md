@@ -7,38 +7,37 @@ When I first got my hands on the framework, I wanted to show off how quickly and
 Let's get started!
 
 ## Setup
-If you haven't already, you'll first need to grab the Splunk Application Framework from GitHub. To get yourself setup, get over to [the Splunk App Framework GitHub repo](https://github.com/splunk/splunk-appframework) and follow the instructions on that page.
+If you haven't already, you'll first need to grab the Splunk App Framework from GitHub. To get yourself set up, get over to [the Splunk App Framework GitHub repo](https://github.com/splunk/splunk-appframework) and follow the instructions on that page.
 
-Once you've gotten the framework setup, type
+Once you've gotten the framework set up, create a new empty app and start the framework by entering:
 
     ./appfx createapp musicdashboard 
     ./appfx run
 
-**NOTE**: For all the examples in this post, we use the Chrome browser, since we will eventually be using some features only supported by that browser. When following along, use Chrome for the best experience.
+**NOTE**: For all the examples in this post, we use Google Chrome because it's the only browser that supports some of the features we will use. So when following along, use Chrome for the best experience.
 
-Navigate to server/apps/musicdashboard and update the first string in your `__init__.py` to something friendly, like "Music dashboard!"
+Navigate to **$APPFRAMEWORK_HOME/server/apps/musicdashboard** and update the first string in your `__init__.py` to something friendly, like "Music dashboard!"
 
-Then, navigate to localhost:3000/appfx/ and observe that the musicdashboard app has been created.
+Then, navigate to <i>http://localhost:3000/appfx/</i> and observe that your new musicdashboard app appears on the Splunk App Framework home page with the other apps. 
 
-Now we'll need some demo data. Grab the CSV file located [here](http://github.com/splunk/splunk-demo-musicdashboard/splunkd/lookups/musicdata.csv) TODO verify link. and drop it in the server/apps/music-dashboard/splunkd/lookups folder.
+Now we'll need some demo data. Grab the CSV file located [here](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/splunkd/lookups/musicdata.csv) and drop it in the **$APPFRAMEWORK_HOME/server/apps/musicdashboard/splunkd/lookups** folder (you'll need to create that subfolder). 
 
-TODO point to github repo of this example, linked somewhere
-TODO images before each section
+At any time, you can take a look at the [splunk-demo-musicdashboard repository](http://github.com/splunk/splunk-demo-musicdashboard), which includes the source code for each step of this example.
 
 ## Step 0: Basic Dashboard
 ![Basic dashboard](step0.png)
 
 Before we dive into the more advanced features of the Splunk App Framework, let's build a basic dashboard, very reminiscent of a dashboard you might find in existing Splunk Apps found on Splunkbase.
 
-First, navigate to the server/apps/music-dashboard folder. Open up home.html, which was placed there are part of the `createapp` setup. Let's make a few dashboard panels using our demo data from the setup portion. We'll make the following dashboards:
+First, navigate to the **$APPFRAMEWORK_HOME/server/apps/musicdashboard/templates** folder, and open home.html in an editor. This HTML file was placed there as part of the `createapp` setup. Let's make a few dashboard panels using our demo data from the setup portion. We'll make the following dashboards:
 
 * A chart showing the artists most searched for
 * A result table showing the songs most downloaded
 * A chart showing the artists most downloaded
 
-Something to note is that the Splunk App Framework comes pre-canned with [Bootstrap styles](http://twitter.github.com/bootstrap/), so some of the layout patterns you'll see below are in that vein.
+Something to note is that the Splunk App Framework includes [Bootstrap styles](http://twitter.github.com/bootstrap/), so some of the layout patterns you'll see below are in that vein.
 
-Let's add some CSS to the CSS block of our HTML template file:
+Let's add some CSS to the CSS block of our HTML template file by replacing the `{% block css %}` with this:
 
 	
 	{% block css %}
@@ -124,7 +123,7 @@ Now we'll add some charts that we'll use to display data. The layout structure h
 
 	{% endblock content%}
 
-As you can see, it's very simple and standard to add charting UI, using Django templates, to your page with a nice dashboard layout. You'll notice that all of these charts take as an option a `contextid`, which points to a search context. We'll define those right now. Immediately after the `{% endblock content %}` line, add the following code:
+As you can see, it's very simple and standard to add charting UI, using Django templates, to your page with a nice dashboard layout. You'll notice that all of these charts take as an option a `contextid`, which points to a search context. We'll define those right now. Immediately after the `{% endblock content %}` line, insert the following code:
 
 	{% block contexts %}
 	    {% search id="search-top-artist-searches" 
@@ -144,7 +143,7 @@ As you can see, it's very simple and standard to add charting UI, using Django t
 
 	{% endblock contexts %}
 
-Finally, let's use the Splunk App Framework's JavaScript API to add some advanced options to one of our charts. Make your `{% block js %}` look like this:
+Finally, let's use the Splunk SDK for JavaScript API to add some advanced options to one of our charts. Replace your `{% block js %}` with this:
 
 	{% block js %}    
 	    <script>
@@ -159,18 +158,18 @@ Finally, let's use the Splunk App Framework's JavaScript API to add some advance
 	    </script>
 	{% endblock js %}
 
-All right, now let's open up http://localhost:3000/appfx/musicdashboard and take a look!
+All right, save this page and let's open up <i>http://localhost:3000/appfx/musicdashboard</i> and take a look!
 
-## Step 1: JQueryUI Accordions
+## Step 1: jQuery UI Accordions
 ![Accordions](step1.png)
 
-Awesome, so by now we've gotten our basic dashboard setup, so we know we can use the framework to make Splunk dashboards. But I wouldn't be writing this post if I didn't want to show you some of the really cool features we've enabled.
+Awesome, so by now we've gotten our basic dashboard set up, so we know we can use the framework to make Splunk dashboards. But I wouldn't be writing this post if I didn't want to show you some of the really cool features we've enabled.
 
-So, let's say that you've decided our dashboard looks too cluttered. It would, for instance, be great if we could collapse the "Top Artist Searches" and "Top Song Downloads" into one container, and place the "Top Artists Downloads" chart to the left, achieving just one row of charts. As a web developer, you are aware that there are many open-source UI widgets available from the web. A popular widget library is [JQuery UI](http://jqueryui.com/). On that site, in particular, an [accordion widget](http://api.jqueryui.com/accordion) is described. We'll choose this widget to help us out with our cluttered layout.
+So, let's say that you've decided our dashboard looks too cluttered. For instance, it would be great if we could collapse the "Top Artist Searches" and "Top Song Downloads" into one container, and place the "Top Artists Downloads" chart to the left, achieving just one row of charts. As a web developer, you are aware that there are many open-source UI widgets available from the web. A popular widget library is [jQuery UI](http://jqueryui.com/). We'll choose the [accordion widget](http://api.jqueryui.com/accordion) that is described on that site to help us out with our cluttered layout.
 
 In navigating to the documentation for the accordion widget, we see [this section](http://api.jqueryui.com/accordion/#entry-examples), describing how to integrate the widget into web pages. Let's use this example to modify our code a bit.
 
-Using the instructions on that page, let's update our layout code, starting with the CSS codeblock. Add this reference, which JQuery UI depends on:
+Using the instructions on that page, let's update our layout code, starting with the CSS codeblock on the musicdashboard's home.html page. Add this jQuery UI reference to the `{% block css %}` section:
 
 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css">
 
@@ -181,11 +180,13 @@ Also, the layout of the panels inside the accordion needs to be changed slightly
         height: 430px;
     }
 
-Now let's rework our `content` block so that we have just one `<div class="row" />` and the column chart appears before the other charts. Simple layout updates get us this:
+Now, let's rework our `{% block content %}` section so that we have just one `<div class="row" />` and the column chart appears before the other charts. Here's the code with our simple layout updates:
 
 	{% block content %}
 
 	<div class="container">
+
+		<!-- First row -->
 	    <div class="row">
 
 	       <!-- Moved up -->
@@ -224,21 +225,22 @@ Now let's rework our `content` block so that we have just one `<div class="row" 
 
 	        
 	    </div>
+	    <!-- End first row -->
 	</div>
 
 	{% endblock content%}
 
-Just like the JQuery UI documentation instructed, we've wrapped our charts in a single `div` with `id="accordion"`. To get the full functionality, we simply need to add a reference to the JQuery UI Accordion in our `{% block js %}` section:
+Just like the jQuery UI documentation instructed, we've wrapped our charts in a single `<div>` tag with `id="accordion"`. To get the full functionality, we simply need to add a reference to the jQuery UI Accordion in our `{% block js %}` section:
 
 	<script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
 
-**NOTE:** There is no need to include JQuery itself. The Splunk App Framework already has it included.
+**NOTE:** There is no need to include jQuery itself because it is already included with the Splunk App Framework.
 
 And just before the line of code `AppFx.on('start', ...);` let's add this JavaScript:
 
 	$('#accordion').accordion();
 
-Just as the documentation describes.  Reload the page and see how easy it was to integrate that accordion!
+Just as the documentation describes. Reload the page and see how easy it was to integrate that accordion!
 
 
 ## Step 2: D3
@@ -248,9 +250,9 @@ Now that our UI is no longer as cluttered, we've freed up some screen real estat
 
 For this example, we'll choose the [Sankey diagram](http://bost.ocks.org/mike/sankey/) to help us visualize which artists' songs are downloaded to which mobile devices.
 
-After reading the documentation for the Sankey diagram we see that it is modular, but the code is a little nasty. I've created a helper library to abstract away some of the complexity. Grab [sankey-helper.js](http://github.com/splunk/splunk-demo-musicdashboard/musicdashboard/static/musicdashboard/sankey-helper.js) and drop it in /server/apps/musicdashboard/static/musicdashboard/. 
+After reading the documentation for the Sankey diagram we see that it is modular, but the code is a little nasty. I've created a helper JavaScript file to abstract away some of the complexity. Grab it from [sankey-helper.js](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/static/musicdashboard/sankey-helper.js) and drop it in **$APPFRAMEWORK_HOME/server/apps/musicdashboard/static/musicdashboard/**. 
 
-Let's also drop some styles in our `style` tag to make the chart nice once it renders:
+Let's also drop some styles in our `<style>` tag back in the home.html page to make the chart nice once it renders:
 
 	#chart {
       height: 500px;
@@ -279,6 +281,7 @@ Let's also drop some styles in our `style` tag to make the chart nice once it re
 
 OK, now for the good stuff. Let's include this D3 component on the page. To start, we'll provision some layout for the chart. Let's make a new row in our container div. Add this code just before the container div's closing tag:
 
+	<!-- Second row -->
 	<div class="row">
         <div class="span12">
            <div class="panel">
@@ -291,8 +294,9 @@ OK, now for the good stuff. Let's include this D3 component on the page. To star
             </div>
         </div>
     </div>
+    <!-- End second row -->
 
-Specifically, notice the `<p id="chart"></p>` tag. Now that we have our layout in place, let add the search that will drive the data for the chart. To our `{% block contexts %}`, add this search:
+Specifically, notice the `<p id="chart"></p>` tag. Now that we have our layout in place, let add the search that will drive the data for the chart. To our `{% block contexts %}` section, add this search context:
 
 	{% search id="sankey-search"
         search='| inputlookup musicdata.csv | stats count by artist_name, eventtype | where (eventtype="ua-mobile-android" OR eventtype="ua-mobile-ipad" OR eventtype="ua-mobile-blackberry" OR eventtype="ua-mobile-iphone" OR eventtype="ua-mobile-ipod")'
@@ -300,13 +304,13 @@ Specifically, notice the `<p id="chart"></p>` tag. Now that we have our layout i
         cache=True
     %}
 
-Let's wire up the JavaScript. Add some more reference script tags in the `{% block js %}`:
+Let's wire up the JavaScript. Add some more reference `<script>` tags in the `{% block js %}` section:
 
 	<script src="http://d3js.org/d3.v2.min.js?2.9.1"></script>
     <script src="http://bost.ocks.org/mike/sankey/sankey.js"></script>
     <script src="{{STATIC_URL}}{{app_name}}/sankey-helper.js"></script>
 
-And now for the code. First, we'll bind to a data context on the search, the make it run. Once it gets data back, we will format it properly for the Sankey diagram. Finally, we will render the diagram. Notice that in the code below, we did not have to make a custom Splunk App Framework component for this diagram to work. Everything is wired up using typical web programming patterns. When we're done, our inline script tag will look like this:
+And now for the code. First, we'll bind to a data context on the search, then run it. Once the search gets data back, we will format it properly for the Sankey diagram. Finally, we will render the diagram. Notice that in the code below, we did not have to make a custom Splunk App Framework component for this diagram to work. Everything is wired up using typical web programming patterns. Here's what the inline script tag looks like now:
 
 	<script>
         $('#accordion').accordion();
@@ -368,9 +372,9 @@ And that's it! No black magic!
 ## Step 3: Interactivity
 ![Interactivity](step3.png)
 
-After having our Sankey diagram in place, it's great to see the relationships in our data, but what if we're also interested in what Splunk events are specifically driving the output for this chart? With just a few more lines of code we can wire up the Sankey diagram to an existing Splunk widget. When you click on a link between an artist and a mobile device, now you'll be able to see which events were responsible for the magnitude of that link.
+After having our Sankey diagram in place, it's great to see the relationships in our data, but what if we're also interested in which Splunk events are specifically driving the output for this chart? With just a few more lines of code we can wire up the Sankey diagram to an existing Splunk widget. When you click on a link between an artist and a mobile device, now you'll be able to see which events were responsible for the magnitude of that link.
 
-First, we'll add a little bit of CSS to ensure the link that we click on will stay highlighted. Also, we'll add a little helper CSS to make the built-in Splunk event results table scrollable. In our `style` tag, then, add:
+First, we'll add a little bit of CSS to ensure the link that we click on will stay highlighted. Also, we'll add a little helper CSS to make the built-in Splunk events table scrollable. In our `<style>` tag, add this:
 
 	.link:hover {
     	stroke-opacity: .5;
@@ -383,6 +387,7 @@ First, we'll add a little bit of CSS to ensure the link that we click on will st
 
 In terms of layout, we'll just add another row with the Splunk `eventtable` widget after the one containing the Sankey diagram:
 
+	<!-- Third row -->
 	<div class="row">
         <div class="span12">
             <div class="panel scrollable">
@@ -395,8 +400,9 @@ In terms of layout, we'll just add another row with the Splunk `eventtable` widg
             </div>
         </div>
     </div>
+    <!-- End third row -->
 
-We'll also need a search context to help us grab the data to drive the output for this `eventtable`. Add this to the `{% block contexts %}`:
+We'll also need a search context to help us grab the data to drive the output for this `eventtable`. Add this to the `{% block contexts %}` section:
 
 	{% search id="interactive-search"
         search="| inputlookup musicdata.csv | search artist_name=\"$artist_name$\" eventtype=\"$eventtype$\""
@@ -407,12 +413,12 @@ We'll also need a search context to help us grab the data to drive the output fo
 
 (Notice how we can easily parameterize the `search` attribute using `$...$` tokens. Check out the JavaScript later for the token replacements.)
 
-Now all we need to do is wire these two UI widgets together using some straighforward JavaScript. After the we render the Sankey diagram in this line of code:
+Now all we need to do is wire these two UI widgets together using some straighforward JavaScript. Look for these two lines of code in the inline `<script>` tag: 
 
 	// Put data into Sankey diagram
     sankeyHelper.renderSankey(nodes, links, setup.svg, setup.sankey, setup.path);
 
-Let's add:
+Right below it, let's add this:
 
 	// Interactivity
     var interactiveSearch = AppFx.Components.getInstance('interactive-search');
@@ -429,7 +435,7 @@ Let's add:
         interactiveSearch.startSearch();
     });
 
-Again, with these few lines of targeted layout and data-binding code, we can achieve interactivity, even between components from two different libraries (built-in Splunk and D3). 
+Save and reload the page, then try it out: click on a line in the "Artists Downloaded to Devices" diagram and see how it updates the events table below it. Again, with these few lines of targeted layout and data-binding code, we can achieve interactivity, even between components from two different libraries (built-in Splunk and D3). 
 
 
 ## Step 4: Images!
@@ -437,9 +443,9 @@ Again, with these few lines of targeted layout and data-binding code, we can ach
 
 OK, so we've done some really cool stuff visualizing data generated from our Splunk instance, but what if we want to take it a step further? Since the Splunk App Framework allows us to use standard web technologies, let's use the data we get back from Splunk to get more detailed data from an external web service and visualize it directly in our Splunk application.
 
-To start, notice how one of our charts shows us the top artists that users search for. We should actually *show* them this data. As it turns out, there's a web service that lets us give it names of artists, and in return, we get the images for those artists. Check it out: it's the [LastFM API](http://www.last.fm/api/intro). To take this demo a step further, we'll need a developer API key in order to make requests to this service. Go ahead and provision one for yourself via the instructions on that site. Once you've done that, we can continue!
+To start, notice how one of our charts shows us the top artists that users search for. We should actually *show* them this data. As it turns out, there's a web service that lets us give it names of artists, and in return, we get the images for those artists. Check it out: it's the [LastFM API](http://www.last.fm/api/intro). To take this demo a step further, you'll need to request your own developer API key to make requests to this service. Go ahead and provision one for yourself via the instructions on that site. Once you've done that, we can continue!
 
-Harnessed with the power of this API key, we can tie our Splunk data to the LastFM API, using standard REST calls from the browser client. After following the LastFM API documentation, and with some prior knowledge of [JQuery.get](http://api.jquery.com/jQuery.get/), we can add some JavaScript code to tie it all together.
+Harnessed with the power of this API key, we can tie our Splunk data to the LastFM API, using standard REST calls from the browser client. After following the LastFM API documentation, and with some prior knowledge of [jQuery.get](http://api.jquery.com/jQuery.get/), we can add some JavaScript code to tie it all together.
 
 Immediately after the line of code `context.startSearch();`, let's add this logic:
 
@@ -491,16 +497,17 @@ Immediately after the line of code `context.startSearch();`, let's add this logi
         }
     });
 
-Notice again how very little of the above code is Splunk-related. Almost all of it is code that could be used in any web app to get data from a third party web service.
+Notice again how very little of the above code is Splunk related. Almost all of the code could be used in any web app to get data from a third-party web service.
 
-If you were to open up the debugger, you'd see that eventually we end up with an array, `artists`, containing artist names and image URLs. Let's come up with a cool way to visualize these images. 
+If we were to open the debugger, we'd see that eventually we end up with an array, `artists`, containing artist names and image URLs. Let's come up with a cool way to visualize these images. 
 
-After a bit more research, we might find this nice slider widget: [Joe Lambert's Flux](http://www.joelambert.co.uk/flux/). Let's just plug this in. First, add this near our other `script` tags:
+After a bit more research, we might find this nice slider widget for transitions: [Joe Lambert's Flux](http://www.joelambert.co.uk/flux/). Let's just plug this in. First, add this after our other `<script>` tags:
 	
 	<script src="http://www.joelambert.co.uk/flux/js/flux.min.js?v=20111012"></script>
 
-We'll add a container for Flux to bind to. To do this, let's update our first row of panels to take up less horizontal space and add the new container. Here's the final result:
+We'll add a container for Flux to bind to. To do this, let's update our first row of panels to take up less horizontal space and add the new container. Edit the `<div class="row">...</div>` section that is surrounded by the comments `<!-- First row -->` and `<!-- End first row -->`. Here's the final result:
 
+	<!-- First row --> 
 	<div class="row">
        <div class="span4">
             <div class="panel">
@@ -542,8 +549,9 @@ We'll add a container for Flux to bind to. To do this, let's update our first ro
         </div>
         
     </div>
+    <!-- End first row -->
 
-Specifically, notice that we've added a `div` with `id="slider"` for the Flux container. Additionally, we've changed `chart-top-artist-searches` to a `resulttable`, which will look better with the shorter width.  Also, let's add this CSS style:
+Specifically, notice that we've added a `<div>` with `id="slider"` for the Flux container. Additionally, we've changed `chart-top-artist-searches` to a `resulttable`, which will look better with the shorter width.  Also, let's add this CSS style to our `{% block css %}` section:
 
 	.panel.slider-panel {
         overflow:visible;
@@ -555,7 +563,7 @@ Specifically, notice that we've added a `div` with `id="slider"` for the Flux co
 
     }
 
-Then, we can replace our `// TODO UI CODE` comment with:
+Then, find the `// TODO UI CODE` line and replace it with this:
 
 	var $slideShow = $('#slider');
 	$slideShow.empty();
@@ -570,7 +578,7 @@ Then, we can replace our `// TODO UI CODE` comment with:
 	    captions: true
 	});
 
-Now, navigate to your page, wait a moment, and lo! images!
+Now, save changes and navigate to your page, wait a moment, and lo! images!
 
 ## No limits
 Hopefully I've given you a good introduction to the new features allowed by the Splunk App Framework. As I've said, I'm really excited to see what developers can build using the new capabilities we've unveiled. Happy coding!
