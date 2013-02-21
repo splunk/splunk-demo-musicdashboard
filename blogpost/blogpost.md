@@ -1,4 +1,4 @@
-# Unleashing the Power of the Splunk App Framework
+# Building Dashboards in the Splunk App Framework
 
 As mentioned in previous posts, the recently released Splunk App Framework allows developers to draw from the power of modern web programming to create new and exciting applications built on Splunk. I'm really excited about all the new abilities the framework provides, and I think it will help usher in some really awesome Splunk Apps.
 
