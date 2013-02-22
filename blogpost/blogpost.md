@@ -12,13 +12,16 @@ If you haven't already, you'll first need to grab the Splunk App Framework from 
 Once you've gotten the framework set up, create a new empty app and start the framework by entering:
 
     ./appfx createapp musicdashboard 
+
+You'll need to provide your Splunk login credentials. Then, enter:
+    
     ./appfx run
 
+Navigate to **$APPFRAMEWORK_HOME/server/apps/musicdashboard** and update the first string in your `__init__.py` to something friendly, like "Music dashboard!" and save it.
+
+Then, navigate to <i>http://localhost:3000/appfx/</i>, log in again on the righthand side, and observe that your new musicdashboard app appears on the Splunk App Framework home page with the other apps. 
+
 **NOTE**: For all the examples in this post, we use Google Chrome because it's the only browser that supports some of the features we will use. So when following along, use Chrome for the best experience.
-
-Navigate to **$APPFRAMEWORK_HOME/server/apps/musicdashboard** and update the first string in your `__init__.py` to something friendly, like "Music dashboard!"
-
-Then, navigate to <i>http://localhost:3000/appfx/</i> and observe that your new musicdashboard app appears on the Splunk App Framework home page with the other apps. 
 
 Now we'll need some demo data. Grab the CSV file located [here](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/splunkd/lookups/musicdata.csv) and drop it in the **$APPFRAMEWORK_HOME/server/apps/musicdashboard/splunkd/lookups** folder (you'll need to create that subfolder). 
 
@@ -250,7 +253,7 @@ Now that our UI is no longer as cluttered, we've freed up some screen real estat
 
 For this example, we'll choose the [Sankey diagram](http://bost.ocks.org/mike/sankey/) to help us visualize which artists' songs are downloaded to which mobile devices.
 
-After reading the documentation for the Sankey diagram we see that it is modular, but the code is a little nasty. I've created a helper JavaScript file to abstract away some of the complexity. Grab it from [sankey-helper.js](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/static/musicdashboard/sankey-helper.js) and drop it in **$APPFRAMEWORK_HOME/server/apps/musicdashboard/static/musicdashboard/**. 
+After reading the documentation for the Sankey diagram we see that it is modular, but the code is a little nasty. I've created a helper JavaScript file to abstract away some of the complexity. Grab a copy of the sankey-helper.js file [here](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/static/musicdashboard/sankey-helper.js) and drop it in **$APPFRAMEWORK_HOME/server/apps/musicdashboard/static/musicdashboard/**. 
 
 Let's also drop some styles in our `<style>` tag back in the home.html page to make the chart nice once it renders:
 
@@ -447,7 +450,7 @@ To start, notice how one of our charts shows us the top artists that users searc
 
 Harnessed with the power of this API key, we can tie our Splunk data to the LastFM API, using standard REST calls from the browser client. After following the LastFM API documentation, and with some prior knowledge of [jQuery.get](http://api.jquery.com/jQuery.get/), we can add some JavaScript code to tie it all together.
 
-Immediately after the line of code `context.startSearch();`, let's add this logic:
+Immediately after the line of code `context.startSearch();`, let's add this logic (and be sure to put in your own developer API key):
 
 	// Get the search context containing artists' names
  	var searchDownloadsContext = AppFx.Components.getInstance('search-top-artist-searches');
