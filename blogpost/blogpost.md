@@ -1,6 +1,6 @@
-# Diving into the Splunk App Framework
+# Diving into the new Splunk App Framework
 
-As mentioned in previous posts, the recently released Splunk App Framework allows developers to draw from the power of modern web programming to create new and exciting applications built on Splunk. I'm really excited about all the new abilities the framework provides, and I think it will help usher in some really awesome Splunk Apps.
+As mentioned in previous posts, the recently-released preview of the [new Splunk App Framework](http://dev.splunk.com/view/app-framework/SP-CAAAEMA) allows developers to draw from the power of modern web programming to create new and exciting applications built on Splunk. I'm really excited about all the new abilities the framework provides, and I think it will help usher in some really awesome Splunk Apps. 
 
 When I first got my hands on the framework, I wanted to show off how quickly and easily a web developer, such as myself, could use standard web technologies to make a simple yet compelling dashboard for Splunk. 
 
