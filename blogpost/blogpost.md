@@ -40,7 +40,7 @@ the only browser that supports some of the features we will use. So when
 following along, use Chrome for the best experience.
 
 Now we'll need some demo data. Grab the CSV file located 
-[here](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/splunkd/lookups/musicdata.csv) 
+[here](https://raw.github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/splunkd/lookups/musicdata.csv) 
 and drop it in the **$APPFRAMEWORK_HOME/server/apps/musicdashboard/splunkd/lookups** 
 folder (you'll need to create that subfolder). 
 
@@ -321,7 +321,7 @@ to help us visualize which artists' songs are downloaded to which mobile devices
 After reading the documentation for the Sankey diagram we see that it is modular, 
 but the code is a little nasty. I've created a helper JavaScript file to 
 abstract away some of the complexity. Grab a copy of the sankey-helper.js file 
-[here](http://github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/static/musicdashboard/sankey-helper.js) 
+[here](http://raw.github.com/splunk/splunk-demo-musicdashboard/master/musicdashboard/static/musicdashboard/sankey-helper.js) 
 and drop it in **$APPFRAMEWORK_HOME/server/apps/musicdashboard/static/musicdashboard/**. 
 
 Let's also drop some styles in our `<style>` tag back in the home.html page 
