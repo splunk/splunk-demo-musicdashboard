@@ -1,6 +1,6 @@
 # The Splunk MusicDashboard Demo 
 
-#### Version 1.0
+#### Version 1.0.1
 
 To demonstrate the capabilities of the Splunk App Framework, we've created this 
 demo app as an example. If you're more interested in how to build applications 
