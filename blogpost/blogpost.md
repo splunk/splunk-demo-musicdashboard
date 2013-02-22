@@ -376,8 +376,8 @@ After having our Sankey diagram in place, it's great to see the relationships in
 
 First, we'll add a little bit of CSS to ensure the link that we click on will stay highlighted. Also, we'll add a little helper CSS to make the built-in Splunk events table scrollable. In our `<style>` tag, add this:
 
-	.link:hover {
-    	stroke-opacity: .5;
+	.link.my-selected {
+        stroke: yellow;
     }
 
     .scrollable {
