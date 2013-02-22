@@ -1,0 +1,332 @@
+{% extends "appfx:base_with_account_bar.html" %}
+
+{% load splunkui %}
+
+{% block title %}{{app_name}} Home Page{% endblock title %}
+
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css">
+
+
+    <style>        
+        .container {
+            margin-top: 30px;
+        }
+
+        .panel.slider-panel {
+            overflow:visible;
+            background-color: initial;
+            border: none;
+            box-shadow: none;
+            max-height: 400px;
+            max-width: 300px;            
+
+        }
+
+        .panel {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0px 1px 1px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin: 0 0 20px 0;
+            height: 548px;
+        }
+        .panel-head {
+            padding-top: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        .panel-body {
+            clear: both;
+            padding-top: 10px;
+            padding-left: 20px;
+            padding-bottom: 20px;
+            padding-right: 20px;
+            height: 400px;
+        }
+        .panel.accordion {
+            margin-bottom:0px;
+            height: 430px;
+        }
+
+        #chart {
+          height: 500px;
+        }
+
+        .node rect {
+          cursor: move;
+          fill-opacity: .9;
+          shape-rendering: crispEdges;
+        }
+
+        .node text {
+          pointer-events: none;
+          text-shadow: 0 1px 0 #fff;
+        }
+
+        .link {
+          fill: none;
+          stroke: #000;
+          stroke-opacity: .2;
+        }
+
+        .link:hover {
+          stroke-opacity: .5;
+        }
+
+        .scrollable {
+            overflow-y: auto;
+        }
+
+        .link.my-selected {
+            stroke: yellow;
+        }
+
+    </style>
+{% endblock css %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+       <div class="span4">
+            <div class="panel">
+                <div class="panel-head">
+                    <h4>Top Artist Downloads</h4>
+                </div>
+                <div class="panel-body">
+                    {% chart id="chart-top-artist-downloads" contextid="search-top-artist-downloads" type="column" %}
+                </div>
+            </div>
+        </div>
+
+        <div class="span4">
+            <div id="accordion">
+                <h3>Top Artist Searches</h3>
+                <div class="panel accordion">
+                    <div class="panel-body less-padding">
+                        {% resulttable id="chart-top-artist-searches" contextid="search-top-artist-searches" %}
+                    </div>
+                </div>
+                
+                <h3>Top Song Downloads</h3>
+                <div class="panel accordion">
+                    <div class="panel-body">
+                        <div class="pull-right">
+                            {% paginator id="paginator-top-song-downloads" %}
+                        </div>
+
+                        {% resulttable id="table-top-song-downloads" contextid="search-top-song-downloads" paginator="paginator-top-song-downloads" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="span4">
+            <div class="panel slider-panel">
+                <div id="slider"></div>
+            </div>
+        </div>
+        
+    </div>
+
+        <div class="row">
+            <div class="span12">
+               <div class="panel">
+                    <div class="panel-head">
+                        <h4>Artists Downloaded to Devices</h4>
+                    </div>
+                    <div class="panel-body">
+                        <p id="chart"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="span12">
+                <div class="panel scrollable">
+                    <div class="panel-head">
+                        <h4>Results for Artists Downloaded to Devices</h4>
+                    </div>
+                    <div class="panel-body">
+                        {% resulttable id="interactive-eventtable" contextid="interactive-search" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock content%}
+
+{% block contexts %}
+        {% search id="search-top-artist-searches" 
+            search='| inputlookup musicdata.csv | search bc_uri=/browse/search/* | top search_terms | fields - percent | rex field=search_terms mode=sed "s/\+/ /g"'
+            cache=True
+        %}
+
+        {% search id="search-top-song-downloads" 
+            search="| inputlookup musicdata.csv | search bc_uri=/sync/addtolibrary* | stats count by track_name | sort count desc | table track_name count"
+            cache=True
+        %}
+
+        {% search id="search-top-artist-downloads" 
+            search="| inputlookup musicdata.csv | search bc_uri=/sync/addtolibrary* | timechart useother=f usenull=f span=20s count by artist_name"
+            cache=True
+        %}
+
+        {% search id="sankey-search"
+            search='| inputlookup musicdata.csv | stats count by artist_name, eventtype | where (eventtype="ua-mobile-android" OR eventtype="ua-mobile-ipad" OR eventtype="ua-mobile-blackberry" OR eventtype="ua-mobile-iphone" OR eventtype="ua-mobile-ipod")'
+            autostart=False
+            cache=True
+        %}
+
+
+        {% search id="interactive-search"
+            search="| inputlookup musicdata.csv | search artist_name=\"$artist_name$\" eventtype=\"$eventtype$\""
+            autostart=False
+            cache=False
+            preview=True
+        %}
+
+
+{% endblock contexts %}
+
+
+
+{% block js %}    
+    <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+    <script src="http://d3js.org/d3.v2.min.js?2.9.1"></script>
+    <script src="http://bost.ocks.org/mike/sankey/sankey.js"></script>
+    <script src="{{STATIC_URL}}{{app_name}}/sankey-helper.js"></script>
+    <script src="http://www.joelambert.co.uk/flux/js/flux.min.js?v=20111012"></script>
+
+    <script>
+        $('#accordion').accordion();
+
+
+        AppFx.on('start', function() {
+            AppFx.Components.getInstance('chart-top-artist-downloads').settings.set({
+                'chart.nullValueMode': 'zero',
+                'chart.stackMode': 'stacked100',
+                'layout.splitSeries': 'false',
+                'legend.placement': 'bottom'
+            });
+
+            var sankeyHelper = window.MusicDashboard.SankeyHelper;
+            var _ = require('underscore');
+
+            var setup = sankeyHelper.setupSankey();
+            var context = AppFx.Components.getInstance('sankey-search');
+
+            var datasource = context.data('results', {
+                output_mode: 'json_rows',
+                count: 0 // get all results
+            });
+            
+            var onDataChanged = function(results) {
+                if (!datasource.hasData()) {
+                    return;
+                }
+
+                // Format Splunk data for Sankey
+                var collection = results.collection().toJSON();
+                var nodesList = _.uniq(_.pluck(collection, "artist_name").concat(_.pluck(collection, "eventtype")));
+                var links = _.map(collection, function(item) {
+                    return {
+                        source: nodesList.indexOf(item.artist_name),
+                        target: nodesList.indexOf(item.eventtype),
+                        value: parseInt(item.count)
+                    }
+                });
+                var nodes = _.map(nodesList, function(node) { return { name: node } }); 
+                
+
+                // Put data into Sankey diagram
+                sankeyHelper.renderSankey(nodes, links, setup.svg, setup.sankey, setup.path);
+
+                // Interactivity
+                var interactiveSearch = AppFx.Components.getInstance('interactive-search');
+                sankeyHelper.getLink().on('click', function(clickedLink) {
+                    // Highlight the link that was clicked
+                    sankeyHelper.getLink().classed("my-selected", false);
+                    d3.select(this).classed("my-selected", true);
+                    
+                    // Token replacements on the search context
+                    interactiveSearch.query.set('artist_name', clickedLink.source.name);
+                    interactiveSearch.query.set('eventtype', clickedLink.target.name);
+                    
+                    // Kick off the search, so our eventtable can render the result set
+                    interactiveSearch.startSearch();
+                });
+
+            };
+
+            datasource.on('data', onDataChanged);
+
+            context.startSearch();
+
+            var searchDownloadsContext = AppFx.Components.getInstance('search-top-artist-searches');
+            var searchDownloadsDataSource = searchDownloadsContext.data('results', {
+                output_mode: 'json_rows',
+                count: 0
+            });
+
+            searchDownloadsDataSource.on('data', function(results) {
+                if (!searchDownloadsDataSource.hasData()) {
+                    return;
+                }
+
+                // TODO add your API key here
+                var apiKey = '';
+                if (!apiKey) { alert('Missing LastFM API key. Please grab one and modify your JavaScript code to include it.'); return; }
+
+                var artists = _.map(results.collection().toJSON(), function(item) { return {name: item.search_terms}; });
+                var normalize = function(s) {
+                    return $.trim(s).toLowerCase();
+                };
+
+                var countdown = artists.length;
+                for (var i = 0; i < artists.length; i++) {
+                    $.get(
+                        'http://ws.audioscrobbler.com/2.0/',
+                        {
+                            'method': 'artist.getInfo',
+                            'api_key': apiKey,
+                            'artist': artists[i].name,
+                            'format': 'json'
+                        },
+                        function(data) {
+                            var artist = _.find(artists, function(a) { return normalize(a.name) === normalize(data.artist.name); });
+                            artist.img = _.find(data.artist.image, function(img) { return img.size === 'mega'; })['#text'];
+
+                            if (--countdown === 0) {
+                                var $slideShow = $('#slider');
+                                $slideShow.empty();
+                                _.each(artists, function(artist) {
+                                    var $el = $('<img src="' + artist.img + '" title="' + artist.name + '" class="artist-image" />');
+                                    $slideShow.append($el);
+                                });
+
+                                $slideShow.show();
+                                new flux.slider('#slider', {
+                                    pagination: false,
+                                    captions: true
+                                });
+
+                            }
+                        }
+                    );
+
+                }
+
+            });
+
+        });
+    </script>
+
+{% endblock js %}
