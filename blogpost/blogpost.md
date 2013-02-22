@@ -19,7 +19,7 @@ You'll need to provide your Splunk login credentials. Then, enter:
 
 Navigate to **$APPFRAMEWORK_HOME/server/apps/musicdashboard** and update the first string in your `__init__.py` to something friendly, like "Music dashboard!" and save it.
 
-Then, navigate to <i>http://localhost:3000/appfx/</i>, log in again on the righthand side, and observe that your new musicdashboard app appears on the Splunk App Framework home page with the other apps. 
+Then, navigate to *http://localhost:3000/appfx/*, log in again on the righthand side, and observe that your new musicdashboard app appears on the Splunk App Framework home page with the other apps. 
 
 **NOTE**: For all the examples in this post, we use Google Chrome because it's the only browser that supports some of the features we will use. So when following along, use Chrome for the best experience.
 
@@ -161,7 +161,7 @@ Finally, let's use the Splunk App Framework JavaScript API to add some advanced 
 	    </script>
 	{% endblock js %}
 
-All right, save this page and let's open up <i>http://localhost:3000/appfx/musicdashboard</i> and take a look!
+All right, save this page and let's open up *http://localhost:3000/appfx/musicdashboard* and take a look!
 
 ## Step 1: jQuery UI Accordions
 ![Accordions](step1.png)
